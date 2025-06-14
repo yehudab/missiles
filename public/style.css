@@ -1,0 +1,75 @@
+:root {
+  --icon-gap: 4px;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: sans-serif;
+}
+
+header, footer, #legend {
+  padding: 10px;
+  text-align: center;
+}
+
+main#rockets {
+  background-color: white;
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
+  overflow: hidden;
+  gap: var(--icon-gap);
+  padding: var(--icon-gap);
+  direction: rtl; 
+}
+
+header, footer {
+  text-align: center;
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+footer {
+  text-align: center;
+  padding: 0.5rem;
+  background-color: #f2f2f2;
+  font-weight: normal;
+  font-size: 0.8rem
+}
+
+main img {
+  width: 24px;
+  height: 24px;
+}
+
+#legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.5rem 1rem;
+  background-color: #fafafa;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.95rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-item img {
+  width: 24px;
+  height: 24px;
+}
