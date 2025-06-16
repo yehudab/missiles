@@ -1,4 +1,4 @@
-  const minIconSize = 24;
+  const minIconSize = 16;
   const maxIconSize = 64;
   const rocketContainer = document.getElementById("rockets");
   const iconGap = 4; // match --icon-gap in CSS
@@ -26,20 +26,29 @@ function renderIcons() {
     const totalHeightPerIcon = size + rowGap;
 
     const iconsPerRow = Math.floor((containerWidth - columnGap) / totalWidthPerIcon);
-    const iconsPerCol = Math.floor((containerHeight - rowGap) / totalHeightPerIcon);
+    const iconsPerCol = Math.floor((containerHeight) / totalHeightPerIcon);
 
     const totalFittable = iconsPerRow * iconsPerCol;
 
-    if (totalFittable >= totalRockets) {
+    if (totalFittable >= totalRockets + totalLaunchers) {
       bestSize = size;
       break;
     }
   }
 
+  for (let i = 0; i < totalLaunchers; i++) {
+    const img = document.createElement("img");
+    img.src = i < totalUsedLaunchers ? "launcher_fill.png" : "launcher.png";
+    img.alt = i < totalUsedLaunchers ? "משגר הושמד * 10" : "משגר במלאי * 10"; 
+    img.style.width = bestSize + "px";
+    img.style.height = bestSize + "px";
+    rocketContainer.appendChild(img);
+  }
+
   for (let i = 0; i < totalRockets; i++) {
     const img = document.createElement("img");
-    img.src = i < totalFilledRockets ? "rocket_fill.png" : "rocket.png";
-    img.alt = "Rocket";
+    img.src = i < totalUsedRockets ? "rocket_fill.png" : "rocket.png";
+    img.alt = i < totalUsedRockets ? "טיל שוגר/הושמד * 10" : "טיל במלאי * 10"; 
     img.style.width = bestSize + "px";
     img.style.height = bestSize + "px";
     rocketContainer.appendChild(img);
