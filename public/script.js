@@ -80,15 +80,36 @@ function handleIconClick(e) {
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
 
-  fireLaser(centerX, centerY);
-  setTimeout(() => {
-    triggerExplosion(centerX, centerY, rect.width * 3);
-  }, 250); // sync with beam hit
+  handleFireAtTarget(centerX, centerY, rect);
 
   // Move icon to used batch after delay
   setTimeout(() => {
     markAsUsed(icon);
-  }, 750);
+  }, 3000);
+}
+
+function playSound(src) {
+  return new Promise((resolve) => {
+    const audio = new Audio(src);
+    audio.addEventListener('ended', resolve);
+    audio.play();
+  });
+}
+
+async function handleFireAtTarget(centerX, centerY, rect) {
+  // Play "שגר"
+  await playSound('shager.mp3');
+
+  // Fire laser after "שגר"
+  fireLaser(centerX, centerY);
+
+
+  setTimeout(() => {
+    const goodShot = new Audio('good-shot.mp3');
+    goodShot.play();
+
+    triggerExplosion(centerX, centerY, rect.width * 3);
+  }, 250); // sync with beam hit
 }
 
 function markAsUsed(icon) {
