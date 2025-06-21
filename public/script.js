@@ -3,8 +3,11 @@ const maxIconSize = 64;
 const rocketContainer = document.getElementById("rockets");
 const iconGap = 4; // match --icon-gap in CSS
 
-let isMuted = true;
 const muteToggle = document.getElementById("mute-toggle");
+const SOUND_SHAGER = "shager.mp3";
+const SOUND_GOOD_SHOT = "good-shot.mp3";
+let isMuted = true;
+let audioCache = {};
 
 function getGapFromComputedStyle(containerEl) {
   const computed = window.getComputedStyle(containerEl);
@@ -91,26 +94,40 @@ function handleIconClick(e) {
   }, isMuted ? 750 : 3000);
 }
 
+function preloadSounds() {
+  [SOUND_SHAGER, SOUND_GOOD_SHOT].forEach((src) => {
+    const audio = new Audio(src);
+    audio.load(); // Start loading
+    audioCache[src] = audio;
+  });
+}
+
 function playSound(src) {
   return new Promise((resolve) => {
     if (isMuted) return resolve();
 
-    const audio = new Audio(src);
-    audio.addEventListener('ended', resolve);
-    audio.play();
+    let audio;
+    if (audioCache[src]) {
+      // Use cached object (clone for replay)
+      audio = audioCache[src].cloneNode();
+    } else {
+      audio = new Audio(src);
+    }
+
+    audio.addEventListener("ended", resolve);
+    audio.play().catch(() => resolve()); // Resolve even if playback fails
   });
 }
 
 async function handleFireAtTarget(centerX, centerY, rect) {
-  // Play "שגר"
-  await playSound('shager.mp3');
+  await playSound(SOUND_SHAGER);
 
   // Fire laser after "שגר"
   fireLaser(centerX, centerY);
 
 
   setTimeout(() => {
-    playSound('good-shot.mp3');
+    playSound(SOUND_GOOD_SHOT);
 
     triggerExplosion(centerX, centerY, rect.width * 3);
   }, 250); // sync with beam hit
@@ -185,6 +202,10 @@ muteToggle.addEventListener("click", () => {
   isMuted = !isMuted;
   muteToggle.textContent = isMuted ? "🔇" : "🔊";
   muteToggle.title = isMuted ? "Unmute 🔊" : "Mute 🔇";
+  
+  if (!isMuted && Object.keys(audioCache).length === 0) {
+    preloadSounds();
+  }
 });
 
 
