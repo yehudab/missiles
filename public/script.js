@@ -3,6 +3,9 @@ const maxIconSize = 64;
 const rocketContainer = document.getElementById("rockets");
 const iconGap = 4; // match --icon-gap in CSS
 
+let isMuted = true;
+const muteToggle = document.getElementById("mute-toggle");
+
 function getGapFromComputedStyle(containerEl) {
   const computed = window.getComputedStyle(containerEl);
   const rowGap = parseFloat(computed.rowGap) || 0;
@@ -85,11 +88,13 @@ function handleIconClick(e) {
   // Move icon to used batch after delay
   setTimeout(() => {
     markAsUsed(icon);
-  }, 3000);
+  }, isMuted ? 750 : 3000);
 }
 
 function playSound(src) {
   return new Promise((resolve) => {
+    if (isMuted) return resolve();
+
     const audio = new Audio(src);
     audio.addEventListener('ended', resolve);
     audio.play();
@@ -105,8 +110,7 @@ async function handleFireAtTarget(centerX, centerY, rect) {
 
 
   setTimeout(() => {
-    const goodShot = new Audio('good-shot.mp3');
-    goodShot.play();
+    playSound('good-shot.mp3');
 
     triggerExplosion(centerX, centerY, rect.width * 3);
   }, 250); // sync with beam hit
@@ -176,6 +180,13 @@ function triggerExplosion(x, y, size = 100) {
   // Clean up after animation
   explosion.addEventListener("transitionend", () => explosion.remove());
 }
+
+muteToggle.addEventListener("click", () => {
+  isMuted = !isMuted;
+  muteToggle.textContent = isMuted ? "🔇" : "🔊";
+  muteToggle.title = isMuted ? "Unmute 🔊" : "Mute 🔇";
+});
+
 
 window.addEventListener("load", renderIcons);
 window.addEventListener("resize", () => {
