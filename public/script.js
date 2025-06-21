@@ -133,32 +133,27 @@ function fireLaser(targetX, targetY) {
 }
 
 function triggerExplosion(x, y, size = 100) {
-  const explosion = document.getElementById('explosion-flash');
+  const explosion = document.createElement("div");
+  explosion.classList.add("explosion-flash");
 
-  // Position the center of the explosion
-  explosion.style.left = `${x - size / 2}px`;
-  explosion.style.top = `${y - size / 2}px`;
-  explosion.style.width = `${size}px`;
-  explosion.style.height = `${size}px`;
+  // Size and position
+  Object.assign(explosion.style, {
+    left: `${x - size / 2}px`,
+    top: `${y - size / 2}px`,
+    width: `${size}px`,
+    height: `${size}px`,
+  });
 
-  // Reset styles
-  explosion.style.transition = 'none';
-  explosion.style.opacity = '0';
-  explosion.style.transform = 'scale(0)';
+  document.body.appendChild(explosion);
 
-  // Trigger reflow
+  // Force reflow before applying animation
   void explosion.offsetWidth;
 
-  // Animate explosion
-  explosion.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-  explosion.style.opacity = '1';
-  explosion.style.transform = 'scale(2)';
+  explosion.style.opacity = "1";
+  explosion.style.transform = "scale(2)";
 
-  // Fade out after delay
-  setTimeout(() => {
-    explosion.style.opacity = '0';
-    explosion.style.transform = 'scale(0)';
-  }, 500);
+  // Clean up after animation
+  explosion.addEventListener("transitionend", () => explosion.remove());
 }
 
 window.addEventListener("load", renderIcons);
