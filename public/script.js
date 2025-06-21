@@ -81,12 +81,14 @@ function handleIconClick(e) {
   const centerY = rect.top + rect.height / 2;
 
   animateLaserTo(centerX, centerY);
-  triggerExplosionAt(centerX, centerY);
+  setTimeout(() => {
+    triggerExplosion(centerX, centerY, rect.width * 3);
+  }, 250); // sync with beam hit
 
   // Move icon to used batch after delay
   setTimeout(() => {
     markAsUsed(icon);
-  }, 600);
+  }, 750);
 }
 
 function markAsUsed(icon) {
@@ -138,26 +140,33 @@ function animateLaserTo(targetX, targetY) {
   }, 250);
 }
 
-function triggerExplosionAt(x, y) {
-  const explosion = document.getElementById("explosion-circle");
-  const size = 300;
+function triggerExplosion(x, y, size = 100) {
+  const explosion = document.getElementById('explosion-flash');
 
+  // Position the center of the explosion
   explosion.style.left = `${x - size / 2}px`;
   explosion.style.top = `${y - size / 2}px`;
   explosion.style.width = `${size}px`;
   explosion.style.height = `${size}px`;
-  explosion.style.opacity = "0.8";
-  explosion.style.transform = "scale(1)";
 
-  setTimeout(() => {
-    explosion.style.opacity = "0";
-    explosion.style.transform = "scale(0)";
-  }, 50);
+  // Reset styles
+  explosion.style.transition = 'none';
+  explosion.style.opacity = '0';
+  explosion.style.transform = 'scale(0)';
 
+  // Trigger reflow
+  void explosion.offsetWidth;
+
+  // Animate explosion
+  explosion.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+  explosion.style.opacity = '1';
+  explosion.style.transform = 'scale(2)';
+
+  // Fade out after delay
   setTimeout(() => {
-    explosion.style.width = "0";
-    explosion.style.height = "0";
-  }, 600);
+    explosion.style.opacity = '0';
+    explosion.style.transform = 'scale(0)';
+  }, 500);
 }
 
 window.addEventListener("load", renderIcons);
