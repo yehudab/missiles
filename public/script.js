@@ -80,7 +80,7 @@ function handleIconClick(e) {
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
 
-  animateLaserTo(centerX, centerY);
+  fireLaser(centerX, centerY);
   setTimeout(() => {
     triggerExplosion(centerX, centerY, rect.width * 3);
   }, 250); // sync with beam hit
@@ -97,7 +97,7 @@ function markAsUsed(icon) {
   icon.src = type === "rocket" ? "rocket_fill.png" : "launcher_fill.png";
 }
 
-function getRandomEdgePosition() {
+function getRandomEdgeStart() {
   const { innerWidth: w, innerHeight: h } = window;
   const edge = Math.floor(Math.random() * 4);
   switch (edge) {
@@ -108,36 +108,28 @@ function getRandomEdgePosition() {
   }
 }
 
-function animateLaserTo(targetX, targetY) {
-  const laser = document.getElementById("laser-beam");
-  const start = getRandomEdgePosition();
+function fireLaser(targetX, targetY) {
+  const start = getRandomEdgeStart();
 
-  // Calculate distance and angle
   const dx = targetX - start.x;
   const dy = targetY - start.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-  const angle = 1.5*Math.PI + Math.atan2(dy, dx);
+  const length = Math.sqrt(dx * dx + dy * dy);
+  const angle = 1.5 * Math.PI + Math.atan2(dy, dx);
 
-  // Reset and show laser
-  laser.style.display = "block";
-  laser.style.left = `${start.x}px`;
-  laser.style.top = `${start.y}px`;
-  laser.style.height = `0px`;
-  laser.style.transform = `rotate(${angle}rad)`;
-  laser.style.transition = "none";
+  // Create beam
+  const beam = document.createElement("div");
+  beam.classList.add("laser-beam");
+  document.body.appendChild(beam);
 
-  // Wait one frame, then animate
-  requestAnimationFrame(() => {
-    laser.style.transition = "height 0.2s linear";
-    laser.style.height = `${distance}px`;
+  Object.assign(beam.style, {
+    left: `${start.x}px`,
+    top: `${start.y}px`,
+    height: `${length}px`,
+    transform: `rotate(${angle}rad)`,
   });
 
-  // After animation, hide beam and reset
-  setTimeout(() => {
-    laser.style.display = "none";
-    laser.style.transition = "none";
-    laser.style.height = "0px";
-  }, 250);
+  // Remove after animation
+  beam.addEventListener("animationend", () => beam.remove());
 }
 
 function triggerExplosion(x, y, size = 100) {
